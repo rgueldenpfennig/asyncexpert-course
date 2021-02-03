@@ -16,7 +16,7 @@ namespace ThreadPoolExercises.Tests
             var testThreadId = 0;
             bool? testThreadIsFromPool = null;
 
-            ThreadingHelpers.ExecuteOnThreadPool(
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(
                 () =>
                 {
                     Thread.Sleep(100);
@@ -38,7 +38,7 @@ namespace ThreadPoolExercises.Tests
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.Cancel();
 
-            ThreadingHelpers.ExecuteOnThreadPool(
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(
                 () => Thread.Sleep(100),
                 3,
                 cts.Token,
@@ -55,7 +55,7 @@ namespace ThreadPoolExercises.Tests
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.CancelAfter(200);
 
-            ThreadingHelpers.ExecuteOnThreadPool(
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(
                 () => Thread.Sleep(100),
                 10,
                 cts.Token,
@@ -69,7 +69,7 @@ namespace ThreadPoolExercises.Tests
         {
             var errorActionMock = new Mock<Action<Exception>>();
 
-            ThreadingHelpers.ExecuteOnThreadPool(
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(
                 () => throw new NullReferenceException(), 
                 10, 
                 errorAction: errorActionMock.Object);
@@ -80,7 +80,7 @@ namespace ThreadPoolExercises.Tests
         [Fact]
         public void ExceptionHandlingWhenErrorActionMissing()
         {
-            ThreadingHelpers.ExecuteOnThreadPool(
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(
                 () => throw new NullReferenceException(),
                 10);
             
@@ -92,7 +92,7 @@ namespace ThreadPoolExercises.Tests
         {
             var data = new DataBag();
 
-            ThreadingHelpers.ExecuteOnThreadPool(
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(
                 () => data.X++, 
                 10);
 

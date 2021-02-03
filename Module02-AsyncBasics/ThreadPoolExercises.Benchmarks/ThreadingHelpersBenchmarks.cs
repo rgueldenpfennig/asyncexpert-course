@@ -7,6 +7,7 @@ using ThreadPoolExercises.Core;
 
 namespace ThreadPoolExercises.Benchmarks
 {
+    [MemoryDiagnoser]
     public class ThreadingHelpersBenchmarks
     {
         private SHA256 sha256 = SHA256.Create();
@@ -21,17 +22,22 @@ namespace ThreadPoolExercises.Benchmarks
 
         [Benchmark]
         public void ExecuteSynchronously() => sha256.ComputeHash(data);
-
+        
         [Benchmark]
         public void ExecuteOnThread()
         {
             ThreadingHelpers.ExecuteOnThread(() => sha256.ComputeHash(data), 1);
         }
-
         [Benchmark]
         public void ExecuteOnThreadPool()
         {
             ThreadingHelpers.ExecuteOnThreadPool(() => sha256.ComputeHash(data), 1);
+        }
+
+        [Benchmark(Baseline = true)]
+        public void ExecuteOnThreadPoolUnsafe()
+        {
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(() => sha256.ComputeHash(data), 1);
         }
     }
 }

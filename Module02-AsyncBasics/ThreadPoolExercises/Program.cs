@@ -18,7 +18,7 @@ namespace ThreadPoolExercises
                 Console.WriteLine($"Hello from thread {thread.ManagedThreadId} from a pool: {thread.IsThreadPoolThread}");
             }, 3);
 
-            ThreadingHelpers.ExecuteOnThreadPool(() =>
+            ThreadingHelpers.ExecuteOnThreadPoolUnsafe(() =>
             {
                 var thread = Thread.CurrentThread;
                 Console.WriteLine(

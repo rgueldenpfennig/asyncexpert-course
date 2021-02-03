@@ -1,6 +1,7 @@
 using Moq;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using ThreadPoolExercises.Core;
 using Xunit;
 using Xunit.Abstractions;
@@ -34,7 +35,7 @@ namespace ThreadPoolExercises.Tests
         public void ImmediateCancellationTest()
         {
             var errorActionMock = new Mock<Action<Exception>>();
-
+            
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.Cancel();
 
