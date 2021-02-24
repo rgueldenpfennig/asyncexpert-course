@@ -5,13 +5,23 @@ namespace AwaitableExercises.Core
 {
     public static class BoolExtensions
     {
+        public static BoolAwaiter GetAwaiter(this bool arg)
+        {
+            return new BoolAwaiter(arg);
+        }
     }
 
     public class BoolAwaiter : INotifyCompletion
     {
-        public void OnCompleted(Action continuation)
+        private readonly bool _arg;
+
+        public BoolAwaiter(bool arg)
         {
-            throw new NotImplementedException();
+            _arg = arg;
         }
+
+        public bool IsCompleted => true;
+        public bool GetResult() => _arg;
+        public void OnCompleted(Action continuation) { }
     }
 }
