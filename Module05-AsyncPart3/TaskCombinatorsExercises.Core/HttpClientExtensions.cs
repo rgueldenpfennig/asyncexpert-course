@@ -1,6 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,9 +21,51 @@ namespace TaskCombinatorsExercises.Core
             - Tip: you can link tokens with the help of CancellationTokenSource.CreateLinkedTokenSource(token)
          */
         public static async Task<string> ConcurrentDownloadAsync(this HttpClient httpClient,
-            string[] urls, int millisecondsTimeout, CancellationToken token)
+            string[] urls,
+            int millisecondsTimeout,
+            CancellationToken token)
         {
-            return String.Empty;
+            using var cts = new CancellationTokenSource(millisecondsTimeout);
+            using var lcts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
+
+            var tasks = new List<Task<HttpResponseMessage>>();
+            foreach (var url in urls)
+            {
+                var task = httpClient.GetAsync(url, lcts.Token);
+                tasks.Add(task);
+            }
+
+            var response = await await Task.WhenAny(tasks);
+            lcts.Cancel();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        //public static async Task<string> ConcurrentDownloadAsync(this HttpClient httpClient,
+        //    string[] urls,
+        //    int millisecondsTimeout,
+        //    CancellationToken token)
+        //{
+        //    using var cts = new CancellationTokenSource(millisecondsTimeout);
+        //    using var lcts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
+
+        //    await foreach (var result in Enumerate(httpClient, urls, lcts.Token))
+        //    {
+        //        lcts.Cancel();
+        //        return result;
+        //    }
+
+        //    return default;
+        //}
+
+        private static async IAsyncEnumerable<string> Enumerate(
+            HttpClient httpClient, string[] urls, [EnumeratorCancellation] CancellationToken token)
+        {
+            foreach (var url in urls)
+            {
+                var response = await httpClient.GetAsync(url, token);
+                yield return await response.Content.ReadAsStringAsync();
+            }
         }
     }
 }
