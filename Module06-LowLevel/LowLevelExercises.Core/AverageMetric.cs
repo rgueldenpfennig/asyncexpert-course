@@ -8,32 +8,22 @@ namespace LowLevelExercises.Core
     /// TODO: remove the locking and use <see cref="Interlocked"/> and <see cref="Volatile"/> to implement a lock-free implementation.
     public class AverageMetric
     {
-        // TODO: this should not be needed, once you remove all the locks below
-        readonly object sync = new object();
-
         int sum = 0;
         int count = 0;
 
         public void Report(int value)
         {
-            // TODO: how to increment sum + count without locking?
-            lock (sync)
-            {
-                sum += value;
-                count += 1;
-            }
+            Interlocked.Increment(ref count);
+            Interlocked.Add(ref sum, value);
         }
 
         public double Average
         {
             get
             {
-                // TODO: how to access the values in a lock-free way?
-                // let's assume that we can return value estimated on a bit stale data(in time average will be less and less diverged)
-                lock (sync)
-                {
-                    return Calculate(count, sum);
-                }
+                var c = Volatile.Read(ref count);
+                var s = sum;
+                return Calculate(c, s);
             }
         }
 
